@@ -135,4 +135,3 @@ orodja.zapisi_csv(
     ['id', 'stevilo_strani', 'jezik', 'izdajatelj', 'drzava', 'opis'], 'obdelani-podatki/posamezni-stripi.csv'
 )
 
-#Se imena avtorjev, izdajateljev zamenjaj s stevilkami
