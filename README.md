@@ -16,6 +16,11 @@ Za vsak strip bom zajel:
 * Država, kjer je bil izdan
 * Opis
 
+Naredil sem dve tabeli:
+* V prvi so zbrani vsi podatki iz osnovne strani
+* V drugi so zbrani podatki iz strani posameznega stripa
+
+Zajel sem 1020 stripov.
 
 Delovne hipoteze:
 * Ali obstajo založbe, ki v povprečju prodajajo dražje stripe?
