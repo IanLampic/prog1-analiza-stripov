@@ -17,8 +17,8 @@ Za vsak strip bom zajel:
 * Opis
 
 Naredil sem dve tabeli:
-* V prvi so zbrani vsi podatki iz osnovne strani
-* V drugi so zbrani podatki iz strani posameznega stripa
+* V prvi so zbrani vsi podatki iz osnovne strani (id, naslov, avtor, leto izida, format, sedanja in prejšnja cena)
+* V drugi so zbrani podatki iz strani posameznega stripa (id, število strani, jezik, založba, država, opis)
 
 Zajel sem 1020 stripov.
 
