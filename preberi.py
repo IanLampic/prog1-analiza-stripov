@@ -60,31 +60,57 @@ def stripi_st_strani(st_strani):
     for blok in vzorec_bloka.finditer(vsebina):
         yield izloci_podatke_stripa(blok.group(0))
 
-def izloci_gnezdene_podatke(stripi):
-    osebe, avtorji = [], []
+import pandas as pd
+
+stripi_izd = pd.read_csv("/Users/ianlampic/Desktop/Financna_matematika/3. letnik/Programiranje 1/Projekt/obdelani-podatki/posamezni-stripi.csv")
+stripi_avt = pd.read_csv("/Users/ianlampic/Desktop/Financna_matematika/3. letnik/Programiranje 1/Projekt/obdelani-podatki/stripi.csv")
+
+izd = set()
+for izdajatelj in stripi_izd["izdajatelj"]:
+    izd.add(izdajatelj)
+IZDAJATELJI = {}
+for i in range(len(izd)):
+    IZDAJATELJI[list(izd)[i]] = i
+
+avtorji = set()
+for avtor in stripi_avt["avtor"]:
+    avtorji.add(avtor)
+AVTORJI = {}
+for i in range(len(avtorji)):
+    AVTORJI[list(avtorji)[i]] = i
+
+#Potrebni sta dve različni datoteki stripov, saj nimate obe vseh želenih podatkov
+def izloci(stripi_avt, stripi_izd):
+    avtorji, izdajatelji, avt_in_izd = [], [], []
     videne_osebe = set()
 
-    def dodaj_vlogo(strip, oseba, mesto):
-        if oseba['id'] not in videne_osebe:
-            videne_osebe.add(oseba['id'])
-            osebe.append(oseba)
-        avtorji.append({
-            'strip': strip['id'],
-            'oseba': oseba['id'],
-            'mesto': mesto,
-        })
+    def dodaj_vlogo(strip, avtor, izdajatelj):
+        if AVTORJI[avtor] not in videne_osebe:
+            videne_osebe.add(AVTORJI[avtor])
+            avtorji.append({
+                "id" : AVTORJI[avtor],
+                "avtor" : avtor})
+        if IZDAJATELJI[izdajatelj] not in videne_osebe:
+            videne_osebe.add(IZDAJATELJI[izdajatelj])
+            izdajatelji.append({
+                "id" : IZDAJATELJI[izdajatelj],
+                "izdajatelj" : izdajatelj}) 
+        avt_in_izd.append({
+                "avtor" : AVTORJI[avtor],
+                "izdajatelj" : IZDAJATELJI[izdajatelj],
+                "strip" : strip["id"]
+            })
 
 
-    for strip in stripi:
-        for mesto, oseba in enumerate(strip.pop()["avtor"], 1):
-            dodaj_vlogo(strip, oseba, mesto)
+    for i in range(len(stripi_avt)):
+        strip_a = stripi_avt.iloc[i]
+        strip_i = stripi_izd.iloc[i]
+        dodaj_vlogo(strip_a, strip_a["avtor"], strip_i["izdajatelj"])
 
-    osebe.sort(key=lambda oseba: oseba['id'])
-
-
-    return osebe
-
-
+    avt_in_izd.sort(key=lambda aviz: (aviz['avtor'], aviz["izdajatelj"], aviz["strip"]))
+    avtorji.sort(key=lambda avt: (avt["id"]))
+    izdajatelji.sort(key=lambda izd: (izd["id"]))
+    return avt_in_izd, izdajatelji, avtorji
 
 stripi = []
 for st_strani in range(1,35):
@@ -92,18 +118,11 @@ for st_strani in range(1,35):
         stripi.append(strip)
 stripi.sort(key=lambda strip: strip['id'])
 orodja.zapisi_json(stripi, 'obdelani-podatki/stripi.json')
-#avtorji = izloci_gnezdene_podatke(stripi)
+avtorji = izloci(stripi)
 orodja.zapisi_csv(
     stripi,
     ['id', 'naslov', 'avtor', 'url', 'leto', 'format', 'sedanja_cena', 'prejsnja_cena'], 'obdelani-podatki/stripi.csv'
 )
-#orodja.zapisi_csv(avtorji, ['id', 'ime'], 'obdelani-podatki/avtorji.csv')
-
-
-
-for strip in [data[:10]]:
-    for mesto, oseba in enumerate(strip.pop(2), 1):
-        print(oseba, mesto)
-
+orodja.zapisi_csv(avtorji, ['id', 'ime'], 'obdelani-podatki/avtorji.csv')
 
 
