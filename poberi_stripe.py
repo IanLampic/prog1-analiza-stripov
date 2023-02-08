@@ -57,14 +57,14 @@ def stripi_st_strani(st_strani):
         yield izloci_podatke_stripa(blok.group(0))
 
 
-stripi = []
+stripi1 = []
 for st_strani in range(1,35):
     for strip in stripi_st_strani(st_strani):
-        stripi.append(strip)
-stripi.sort(key=lambda strip: strip['id'])
-orodja.zapisi_json(stripi, 'obdelani-podatki/stripi.json')
+        stripi1.append(strip)
+stripi1.sort(key=lambda strip: strip['id'])
+orodja.zapisi_json(stripi1, 'obdelani-podatki/stripi.json')
 orodja.zapisi_csv(
-    stripi,
+    stripi1,
     ['id', 'naslov', 'avtor', 'url', 'leto', 'format', 'sedanja_cena', 'prejsnja_cena'], 'obdelani-podatki/stripi.csv'
 )
 
@@ -134,4 +134,61 @@ orodja.zapisi_csv(
     stripi2,
     ['id', 'stevilo_strani', 'jezik', 'izdajatelj', 'drzava', 'opis'], 'obdelani-podatki/posamezni-stripi.csv'
 )
+
+import pandas as pd
+
+stripi_izd = pd.read_csv("/Users/ianlampic/Desktop/Financna_matematika/3. letnik/Programiranje 1/Projekt/obdelani-podatki/posamezni-stripi.csv")
+stripi_avt = pd.read_csv("/Users/ianlampic/Desktop/Financna_matematika/3. letnik/Programiranje 1/Projekt/obdelani-podatki/stripi.csv")
+
+izd = set()
+for izdajatelj in stripi_izd["izdajatelj"]:
+    izd.add(izdajatelj)
+IZDAJATELJI = {}
+for i in range(len(izd)):
+    IZDAJATELJI[list(izd)[i]] = i
+
+avtorji = set()
+for avtor in stripi_avt["avtor"]:
+    avtorji.add(avtor)
+AVTORJI = {}
+for i in range(len(avtorji)):
+    AVTORJI[list(avtorji)[i]] = i
+
+#Potrebni sta dve različni datoteki stripov, saj nimate obe vseh želenih podatkov
+def izloci(stripi_avt, stripi_izd):
+    avtorji, izdajatelji, avt_in_izd = [], [], []
+    videni_avtorji = set()
+    videni_izda = set()
+
+    def dodaj_vlogo(strip, avtor, izdajatelj):
+        if AVTORJI[avtor] not in videni_avtorji:
+            videni_avtorji.add(AVTORJI[avtor])
+            avtorji.append({
+                "id" : AVTORJI[avtor],
+                "avtor" : avtor})
+        if IZDAJATELJI[izdajatelj] not in videni_izda:
+            videni_izda.add(IZDAJATELJI[izdajatelj])
+            izdajatelji.append({
+                "id" : IZDAJATELJI[izdajatelj],
+                "izdajatelj" : izdajatelj}) 
+        avt_in_izd.append({
+                "avtor" : AVTORJI[avtor],
+                "izdajatelj" : IZDAJATELJI[izdajatelj],
+                "strip" : strip["id"]
+            })
+
+    for i in range(len(stripi_avt)):
+        strip_a = stripi_avt.iloc[i]
+        strip_i = stripi_izd.iloc[i]
+        dodaj_vlogo(strip_a, strip_a["avtor"], strip_i["izdajatelj"])
+
+    avt_in_izd.sort(key=lambda aviz: (aviz['avtor'], aviz["izdajatelj"], aviz["strip"]))
+    avtorji.sort(key=lambda avt: (avt["id"]))
+    izdajatelji.sort(key=lambda izd: (izd["id"]))
+    return avt_in_izd, izdajatelji, avtorji
+
+avt_in_izd, izdajatelji, avtorji = izloci(stripi_avt, stripi_izd)
+orodja.zapisi_csv(avt_in_izd, ['avtor', 'izdajatelj', 'strip'], 'obdelani-podatki/avtorji-izdajatelji.csv')
+orodja.zapisi_csv(izdajatelji, ['id', 'izdajatelj'], 'obdelani-podatki/izdajatelji.csv')
+orodja.zapisi_csv(avtorji, ['id', 'avtor'], 'obdelani-podatki/avtorji.csv')
 
