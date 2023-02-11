@@ -1,4 +1,4 @@
-#Analiza stripov
+# Analiza stripov
 
 V okviru predmeta Programiranje 1 bom preučil stripe. Podatke bom dobil na spletnem naslovu: https://www.bookdepository.com
 
