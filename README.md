@@ -26,4 +26,4 @@ Delovne hipoteze:
 * Ali obstajo založbe, ki v povprečju prodajajo dražje stripe?
 * Ali obstaja povezava med ceno in številom strani?
 * Ali je število izdaj posameznega stripa povezano s ceno?
-* Ali so stripi s trdimi platnicami so v povprečju dražji?
+* Ali so stripi s trdimi platnicami v povprečju dražji?
